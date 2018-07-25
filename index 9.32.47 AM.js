@@ -623,7 +623,7 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 
 		    });
-	  		
+	  		app.data.prevIntent = "supEnd";
 	  		app.setContext('supfour', 0, {});
 	  		app.setContext('supend', 1, {});
 	  		app.ask(output);
@@ -669,7 +669,7 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 
 		    });
-	  		
+	  		app.data.prevIntent = "supEnd";
 	  		app.setContext('supfour', 0, {});
 	  		app.setContext('supend', 1, {});
 	  		app.ask(output);
@@ -715,7 +715,7 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 
 		    });
-	  		
+	  		app.data.prevIntent = "supEnd";
 	  		app.setContext('supfour', 0, {});
 	  		app.setContext('supend', 1, {});
 	  		app.ask(output);

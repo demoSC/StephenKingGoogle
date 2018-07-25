@@ -3,35 +3,161 @@ const { DialogflowApp } = require('actions-on-google');
 const functions = require('firebase-functions');
 const firebase = require('firebase-admin');
 
-const introText = "Welcome to Read Stephen King. In this experience, you'll be guided through a series of questions. Follow your intrigue and let your imagination be your guide. Your answers will allow us to recommend a personalized reading list of Stephen King books best suited for you. Don't worry about picking your next great read, we'll recommend an entire list for you. If you're ready to begin, say yes.";
-const genreQOne = "Imagine an apocalyptic world. You have to belong to one of three groups to survive. Your options are, the Magicians who are masters of illusion. The Mentalists who spin a web of gripping mind games. Or the Scientists who are engrossed in the latest technology. Do you create ties with the Magicians, the Mentalists or the Scientists?";
-const genreQTwo = "Wise choice. Next question. Your friend invites you over for his annual campfire. Every year he starts the night with a story. You know that he has three terrific tales in his arsenal. One is about his grandmother's ghost. The second, an alien invasion. And the third is the story of a small town serial killer. Do you hope he tells the one about grandma's ghost, aliens, or the serial killer?";
-const genreQThree = "Good to know, let's keep going. You just checked into an old hotel and decide to explore. You reach the end of a hallway and there are three marked doors ahead of you. Door One is a portal to an alternate world. Door Two leads to a labyrinth. And Door Three leads to a time travel machine. Which do you choose? The door that leads to the alternate world, the labyrinth, or the time travel machine?";
-const psyQuestionOne = "Next question. You're on a long bus ride. It's been smooth so far and you're starting to doze off. Then, all of a sudden, the driver starts speeding and veering from one lane to another. You could, walk to the front of the bus and tell the driver to slow down. Sit in your seat terrified hoping the driver regains control. Or laugh and encourage the driver to go faster. Do you: tell the driver to slow down, sit in your seat, or tell the driver go faster";
-const psyQuestionTwo = "I'd probably do the same. You wake with a headache and have a vague memory of the night before. You look around and see chairs knocked over. Books are scattered all over the floor. You walk out of your bedroom and notice the hallway mirror is cracked. Did someone break in? Was there an earthquake? Did you have a fight with someone? Or is it possible you did this in a blind act of rage? You have to make a choice. You can either call the police to get help right away, or keep exploring, looking for clues because you, yourself, may be the culprit. Do you call the police, or keep exploring?";
-const psyQuestionThree = "Interesting choice. Let's keep moving. You accidentally scratched your neighbor's car this morning. You hear a knock at the door. You're sure the neighbors are here to question you. You could completely deny it and make up a cover story or tell the truth and hope they will understand. Do you make up a cover-story or tell the truth?";
-const psyQuestionFour = "I had a feeling you were going to say that. Last Question. You're traveling with friends in a historic town. Tomorrow night, it's your turn to plan the group activity. You have the options whittled down to two, take everyone on a guided ghost tour of downtown. Or design your own murder mystery dinner. Do you take the ghost tour or make dinner?";
-const sciQuestionOne = "I thought you'd say that. There's been unrest in your town for the past few months. There's three rallies tackling local issues this Saturday. One rally is about the integrity of the mayor, another is about crime rates, and the last is about Doomsday preparedness. Which rally do you attend: the one about the mayor, crime or doomsday prep?";
-const sciQuestionTwo = "I support your cause. Onwards!<break time='.5s'/> You open your medicine cabinet and notice two little blue viles. One is labeled full immunity, and the other is absolve guilt. Do you feel the most compelled to take a sip of the vile for immunity, or memory";
-const sciQuestionThree = "Cheers to that. On to the next. You have a bumper sticker on your car. Does it say my other car is a spaceship, or seize the day?";
-const sciQuestionFour = "Let's continue. You're having lunch with a friend. She's getting married in a month and just told you she's having cold feet. Honestly, you don't know much about her partner but your friend is putting you on the spot for advice. You could reduce her anxiousness by telling her everyone experiences uncertainty or you could tell her to take a solo-trip and think it through. What’s your advice; go through with it or explore the unknown?";
-const supQuestionOne = "I thought you'd say that. You’re going to an amusement park. Woah, there’s so much to choose from. You could start with the haunted house where everyone leaves screaming, a game where you battle dragons, or you could sink a stranger in the dunk tank. Do you head towards the haunted house, battling dragons or the dunk tank?";
-const supQuestionTwo = "Let's keep moving. It's friday night, you know what that means; movies and take-out. You have three movie options, a thrilling murder mystery, cops and robbers, or phantoms haunting a small-town. Do you watch the murder mystery, cops and robbers, or the one about phantoms?";
-const supQuestionThree = "I would've chosen the same movie. You’re stranded on a desert island. You can only bring one thing. Your choices are a telescope to look at the stars, a journal to unleash your deepest thoughts, or a slingshot to keep you entertained. Do you pack the telescope, journal or slingshot?";
-const supQuestionFour = "You’re in a museum. There's a couple exhibits you're choosing between. On the first floor the exhibit explores the downfall of great societies, the second floor is dedicated to the world's best explorers or the third floor showcases unsolved mysteries? Do you choose to see the exhibit on of great societies, explorers or unsolved mysteries?";
-const outroPartOne = "Congratulations, you've completed all the questions! Lots of bold choices. Your carefully selected answers reveal that you are someone who would get the biggest thrill out of the "; 
-const outroPartTwo = " reading list. We recommend starting with  and here's a short preview sound bite. The rest of the books on the list are insert remaining books. By the way if you're interested in Stephen King's life, his book On Writing is a part memoir, part masterclass that takes the reader on a compelling journey through King's craft. Now with your burning desire to read, go forth and explore the rich and irresistable world of Stephen King.";
+const introText = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/INTRO.mp3'>Welcome to the Stephen King Library</audio>";
+const introRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/04_WELCOME_BACK_2W.MUSIC.mp3'>Welcome to the Stephen King Library</audio>";
+const genreQOne = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/01_IGQ1.mp3'>Question One</audio>";
+const genreQTwo = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/02_IGQ1.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/03_IGQ2.mp3'>Question Two</audio>";
+const genreQThree = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/04_IGQ2.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/05_IGQ3.mp3'>Question Three</audio>";
+const psyQuestionOne = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/06_IGQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/01_GAQ1.mp3'>Question Four</audio>";
+const psyQuestionTwo = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/02_GAQ1.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/03_GAQ2.mp3'>Question Five</audio>";
+const psyQuestionThree = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/04_GAQ2.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/05_GAQ3.mp3'>Question Six</audio>";
+const psyQuestionFour = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/06_GAQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/07_GAQ4_V2.mp3'>Question Seven</audio>";
+const sciQuestionOne = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/06_IGQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/01_GBQ1.mp3'>Question Four</audio>";
+const sciQuestionTwo = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/02_GBQ1.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/03_GBQ2.mp3'>Question Five</audio>";
+const sciQuestionThree = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/04_GBQ2.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/05_GBQ3.mp3'>Question Six</audio>";
+const sciQuestionFour = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/06_GBQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/07_GBQ4.mp3'>Question Seven</audio>";
+const supQuestionOne = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/06_IGQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/01_GCQ1.mp3'>Question Four</audio>";
+const supQuestionTwo = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/02_GCQ1.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/03_GCQ2.mp3'>Question Five</audio>";
+const supQuestionThree = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/04_GCQ2.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/05_GCQ3.mp3'>Question Six</audio>";
+const supQuestionFour = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/06_GCQ3.1.mp3'></audio><break time='.25s' /><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/07_GCQ4.mp3'>Question Seven</audio>";
+
+
+const genreQTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/03_IGQ2.mp3'>Question Two</audio>";
+const genreQThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/05_IGQ3.mp3'>Question Three</audio>";
+const psyQuestionOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/01_GAQ1.mp3'>Question Four</audio>";
+const psyQuestionTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/03_GAQ2.mp3'>Question Five</audio>";
+const psyQuestionThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/05_GAQ3.mp3'>Question Six</audio>";
+const psyQuestionFourRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/07_GAQ4_V2.mp3'>Question Seven</audio>";
+const sciQuestionOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/01_GBQ1.mp3'>Question Four</audio>";
+const sciQuestionTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/03_GBQ2.mp3'>Question Five</audio>";
+const sciQuestionThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/05_GBQ3.mp3'>Question Six</audio>";
+const sciQuestionFourRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/07_GBQ4.mp3'>Question Seven</audio>";
+const supQuestionOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/01_GCQ1.mp3'>Question Four</audio>";
+const supQuestionTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/03_GCQ2.mp3'>Question Five</audio>";
+const supQuestionThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/05_GCQ3.mp3'>Question Six</audio>";
+const supQuestionFourRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/07_GCQ4.mp3'>Question Seven</audio>";
+
+
+
+const introRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/INTRO_Rep.mp3'>Introduction Message</audio>";
+const genreOneRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/01_IGQ1_Rep.mp3'>Question One</audio>";
+const genreTwoRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/03_IGQ2_Rep.mp3'>Question Two</audio>";
+const genreThreeRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/genrequestions/05_IGQ3_Rep.mp3'>Question Three</audio>";
+const psyOneRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/01_GAQ1_Rep.mp3'>Question Four</audio>";
+const psyTwoRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/03_GAQ2_Rep.mp3'>Question Five</audio>";
+const psyThreeRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/05_GAQ3_Rep.mp3'>Question Six</audio>";
+const psyFourRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/07_GAQ4_V2_Rep.mp3'>Question Seven</audio>";
+const sciOneRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/01_GBQ1_Rep.mp3'>Question Four</audio>";
+const sciTwoRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/03_GBQ2_Rep.mp3'>Question Five</audio>";
+const sciThreeRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/05_GBQ3_Rep.mp3'>Question Six</audio>";
+const sciFourRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/07_GBQ4_Rep.mp3'>Question Seven</audio>";
+const supOneRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/01_GCQ1_Rep.mp3'>Question Four</audio>";
+const supTwoRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/03_GCQ2_Rep.mp3'>Question Five</audio>";
+const supThreeRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/05_GCQ3Rep.mp3'>Question Six</audio>";
+const supFourRep = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/07_GCQ4Rep.mp3'>Question Seven</audio>";
+const psyPackOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/01_OUTRO1.mp3'>Your Reading List</audio>";
+const psyPackTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/04_OUTRO2.mp3'>Your Reading List</audio>";
+const psyPackThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/07_OUTRO3.mp3'>Your Reading List</audio>";
+const sciPackOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/10_OUTRO4.mp3'>Your Reading List</audio>";
+const sciPackTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/13_OUTRO5.mp3'>Your Reading List</audio>";
+const sciPackThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/16_OUTRO6.mp3'>Your Reading List</audio>";
+const supPackOneRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/19_OUTRO7.mp3'>Your Reading List</audio>";
+const supPackTwoRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/22_OUTRO8.mp3'>Your Reading List</audio>";
+const supPackThreeRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/25_OUTRO9.mp3'>Your Reading List</audio>";
+const supPackFourRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/28_OUTRO10.mp3'>Your Reading List</audio>";
+const supPackFiveRepeat = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/31_OUTRO11.mp3'>Your Reading List</audio>";
+
+const psyPackOneIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/08_GAQ4.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/01_OUTRO1.mp3'>www.stephenkinglibrary1.com</audio>";
+const psyPackOneClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/02_OUTRO1.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/01_Misery_Final.mp3'>www.stephenkinglibrary1.com</audio>";
+const psyPackOneEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/03_OUTRO1.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary1.com</audio>";
+const psyPackOneRep = "Would you like to hear a short preview of Misery?";
+
+const psyPackTwoIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/08_GAQ4.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/04_OUTRO2.mp3'>www.stephenkinglibrary2.com</audio>";
+const psyPackTwoClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/05_OUTRO2.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/02_Finders+Keepers_Final.mp3'>www.stephenkinglibrary2.com</audio>";
+const psyPackTwoEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/06_OUTRO2.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary2.com</audio>";
+const psyPackTwoRep = "Would you like to hear a short preview of Finders Keepers?";
+
+const psyPackThreeIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/psyquestions/08_GAQ4.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/07_OUTRO3.mp3'>www.stephenkinglibrary3.com</audio>";
+const psyPackThreeClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/08_OUTRO3.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/03_Bag+of+Bones_Final.mp3'>www.stephenkinglibrary3.com</audio>";
+const psyPackThreeEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/09_OUTRO3.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary3.com</audio>";
+const psyPackThreeRep = "Would you like to hear a short preview of Bag of Bones?";
+
+
+const sciPackOneIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/08_GBQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/10_OUTRO4.mp3'>www.stephenkinglibrary4.com</audio>";
+const sciPackOneClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/11_OUTRO4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/04_Firestarter_Final.mp3'>www.stephenkinglibrary4.com</audio>";
+const sciPackOneEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/12_OUTRO4.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary4.com</audio>";
+const sciPackOneRep = "Would you like to hear a short preview of Firestarter";
+
+const sciPackTwoIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/08_GBQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/13_OUTRO5.mp3'>www.stephenkinglibrary5.com</audio>";
+const sciPackTwoClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/14_OUTRO5.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/05_Dark+Tower+I+_FINAL.mp3'>www.stephenkinglibrary5.com</audio>";
+const sciPackTwoEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/15_OUTRO5.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary5.com</audio>";
+const sciPackTwoRep = "Would you like to hear a short preview of the Dark Tower 1?";
+
+const sciPackThreeIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/sciquestions/08_GBQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/16_OUTRO6.mp3'>www.stephenkinglibrary6.com</audio>";
+const sciPackThreeClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/17_OUTRO6.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/06_11.22.63_Final.mp3'>www.stephenkinglibrary6.com</audio>";
+const sciPackThreeEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/18_OUTRO6.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary6.com</audio>";
+const sciPackThreeRep = "Would you like to hear a short preview of 11, 22, 19 63?";
+
+
+const supPackOneIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/08_GCQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/19_OUTRO7.mp3'>www.stephenkinglibrary7.com</audio>";
+const supPackOneClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/20_OUTRO7.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/11_The+Outsider_Final.mp3'>www.stephenkinglibrary7.com</audio>";
+const supPackOneEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/21_OUTRO7.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary7.com</audio>";
+const supPackOneRep = "Would you like to hear a short preview of the Outsider?";
+
+const supPackTwoIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/08_GCQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/22_OUTRO8.mp3'>www.stephenkinglibrary8.com</audio>";
+const supPackTwoClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/23_OUTRO8.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/07_Lisey_s+Story_Final.mp3'>www.stephenkinglibrary8.com</audio>";
+const supPackTwoEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/24_OUTRO8.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary8.com</audio>";
+const supPackTwoRep = "Would you like to hear a short preview of Lisey's Story?";
+
+const supPackThreeIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/08_GCQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/25_OUTRO9.mp3'>www.stephenkinglibrary9.com</audio>";
+const supPackThreeClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/26_OUTRO9.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/08_IT_Final.mp3'>www.stephenkinglibrary9.com</audio>";
+const supPackThreeEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/27_OUTRO9.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary9.com</audio>";
+const supPackThreeRep = "Would you like to hear a short preview of It?";
+
+const supPackFourIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/08_GCQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/28_OUTRO10.mp3'>www.stephenkinglibrary10.com</audio>";
+const supPackFourClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/29_OUTRO10.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/09_Revival_Final.mp3'>www.stephenkinglibrary10.com</audio>";
+const supPackFourEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/30_OUTRO10.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary10.com</audio>";
+const supPackFourRep = "Would you like to hear a short preview of Revival?";
+
+const supPackFiveIntro = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/supquestions/08_GCQ4.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/31_OUTRO11.mp3'>www.stephenkinglibrary11.com</audio>";
+const supPackFiveClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/32_OUTRO11.1.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/10_Pet+Sematary_Final.mp3'>www.stephenkinglibrary11.com</audio>";
+const supPackFiveEnd = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/33_OUTRO11.2.mp3'></audio><break time='.25s'/><audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/outros/34_OUTROENDING.mp3'>www.stephenkinglibrary11.com</audio>";
+const supPackFiveRep = "Would you like to hear a short preview of Pet Sematary?";
+
+const writeEgg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/12_On_Writing_Final.mp3'>On Writing Easter Egg</audio>";
+const sbEE = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/SKOK_mixdown.mp3'>Sleeping Beauties Easter Egg</audio>";
+const outClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/11_The_Outsider_Final.mp3'>The Outsider Easter Egg</audio>";
+
+const startOv = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/06_STARTING_OVER.mp3'>Starting Over</audio>";
+const stopMsg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/11_EXIT_SEEYOUSOON.mp3'>Stopping</audio>";
+const helpMsg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/09_HELP_STUCK.mp3'>Help!</audio>";
+const errorMsg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/10_ERROR_REPEAT.mp3'>Please Repeat</audio>";
+const pauseMsg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/05_PAUSING.mp3'>Pause does not work in this experience</audio>";
+
+const funFacts = [
+	"In Finders Keepers, a deranged fan murders a reclusive writer and steals notebooks containing unpublished, hand-written work. In 1999, Stephen King submitted an entirely handwritten manuscript to his publisher. Dreamcatcher went on to be a big bestseller. Find your personalized King reading list. <break time='.25s'/> Say Ok Google, Open Stephen King Library. Or for another fun fact, say Ok Google ask Stephen King Library for Extras.",
+	"Stephen King wrote several bestselling books under the name Richard Bachman. Fittingly, his secret identity was exposed by a bookstore clerk. Find your personalized King reading list. Say Ok Google, Open Stephen King Library. Or for another fun fact, say Ok Google, ask Stephen King Library for Extras.",
+	"On a recent episode of Jeopardy, Stephen King is credited as being the first author to use the phrase shut your pie hole in a novel. That’s also what David Duchovny might tell you if you mentioned this to him; he’s still upset about losing Jeopardy to Stephen in 1995. Find your personalized King reading list. Say Ok Google, Open Stephen King Library. Or for another fun fact, say Ok Google ask Stephen King Library for Extras.",
+	"Stephen King married Tabitha Spruce in 1971.  They met in the stacks of the Fogler Library, at the University of Maine at Orono, where they both worked as students. Find your personalized King reading list. Say Ok Google, Open Stephen King Library. Or for another fun fact, say Ok Google ask Stephen King Library for Extras.",
+	"Stephen King’s first novel, Carrie was published in 1974.  His 60th novel, The Outsider, was published in 2018. Find your personalized King reading list. Say Ok Google, Open Stephen King Library. Or for another fun fact, say Ok Google ask Stephen King Library for Extras."
+
+];
+
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
+
+
+
+
 let calculateWinner = function(catChoice, answerOne, answerTwo, answerThree, answerFour){
 
-	let P1 = "";
-	let P2 = "";
-	let P3 = "";
-	let P4 = "";
-	let P5 = "";
+	let P1 = 0;
+	let P2 = 0;
+	let P3 = 0;
+	let P4 = 0;
+	let P5 = 0;
 
 	let winner = "";
 	console.log("you're in winner calc. The stats are: "+catChoice+", "+answerOne+", "+answerTwo+", "+answerThree+", "+answerFour);
@@ -357,7 +483,7 @@ let calculateWinner = function(catChoice, answerOne, answerTwo, answerThree, ans
 
 
 	
-
+	console.log(winner+", "+answerOne+", "+answerTwo+", "+answerThree+", "+answerFour);
 	return winner;
 
 
@@ -433,271 +559,885 @@ let calculateGenre = function(catOne, catTwo, catThree){
 	return catChoice;
 
 };
+
 exports.stephenKing = functions.https.onRequest((request, response) => {
 
 	  const app = new DialogflowApp({request, response});
 	  console.log('Request headers: ' + JSON.stringify(request.headers));
 	  console.log('Request body: ' + JSON.stringify(request.body));
 
+	  function pause(app){
+	  		let output = "";
+	  		let prevIntent = app.data.prevIntent;
+
+	  		if(prevIntent == "welcome"){
+	  			if(app.getLastSeen()){
+	  				output = introRepeat;
+	  			}else{
+	  				output = introText;
+	  			}
+	  		}else if(prevIntent == "genreQone"){
+	  			output = genreQOne;
+	  		}else if(prevIntent == "genreQtwo"){
+	  			output = genreQTwoRepeat;
+	  		}else if(prevIntent == "genreQthree"){
+	  			output = genreQThreeRepeat;
+	  		}else if(prevIntent == "psyQone"){
+	  			output = psyQuestionOneRepeat;
+	  		}else if(prevIntent == "psyQtwo"){
+	  			output = psyQuestionTwoRepeat;
+	  		}else if(prevIntent == "psyQthree"){
+	  			output = psyQuestionThreeRepeat;
+	  		}else if(prevIntent == "psyQfour"){
+	  			output = psyQuestionFourRepeat;
+	  		}else if(prevIntent == "sciQone"){
+	  			output = sciQuestionOneRepeat;
+	  		}else if(prevIntent == "sciQtwo"){
+	  			output = sciQuestionTwoRepeat;
+	  		}else if(prevIntent == "sciQthree"){
+	  			output = sciQuestionThreeRepeat;
+	  		}else if(prevIntent == "sciQfour"){
+	  			output = sciQuestionFourRepeat;
+	  		}else if(prevIntent == "supQone"){
+	  			output = supQuestionOneRepeat;
+	  		}else if(prevIntent == "supQtwo"){
+	  			output = supQuestionTwoRepeat;
+	  		}else if(prevIntent == "supQthree"){
+	  			output = supQuestionThreeRepeat;
+	  		}else if(prevIntent == "supQfour"){
+	  			output = supQuestionFourRepeat;
+	  		}else if(prevIntent == "psyEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = psyPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = psyPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = psyPackThreeRepeat;
+	  			}
+	  		}else if(prevIntent == "sciEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = sciPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = sciPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = sciPackThreeRepeat;
+	  			}
+	  		}else if(prevIntent == "supEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = supPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = supPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = supPackThreeRepeat;
+	  			}else if(winner == "P4"){
+	  				output = supPackFourRepeat;
+	  			}else if(winner == "P5"){
+	  				output = supPackFiveRepeat;
+	  			}
+	  		}
+	  		app.ask("<speak>"+pauseMsg+"<break time='.25s'/>"+output+"</speak>");
+	  }
+
+	  function sb(app){
+		  	let output = "<speak>Here is a clip of Stephen King and his son, Owen King, talking about writing the book together."+sbEE+"By the way, If you’re looking for your next great read, say, Ok Google, open Stephen King Library.</speak>";
+		  	app.tell(output);
+	  }
+
+	  function castle(app){
+		  	let output = "<speak>Castle Rock is a fictional town deep in the main woodlands. Many of King’s works, Cujo, The Dark Half, and Needful Things, as well as the novella, The Body and numerous short stories such as Rita Hayworth and The Shawshank Redemption are set there or contain references to Castle Rock. By the way, If you’re looking for your next great read, say, Ok Google, open Stephen King Library.</speak>";
+		  	app.tell(output);
+	  }
+
+	  function onWrite(app){
+		  	let output = "<speak>You don't often hear a true master talking about his craft. But here is Stephen King talking about his art. Enjoy!"+ writeEgg + "You just listened to an excerpt from On Writing. If you’re looking for your next great read, say, Ok Google, open Stephen King Library</speak>";
+		  	app.tell(output);
+	  }
+
+	  function outsider(app){
+		  	let output ="<speak>Here's an audio excerpt from the Outsider."+outClip+"If you’re looking for your next great read, say Alexa, open Stephen King Library.</speak>";
+		  	app.tell(output);
+
+	  }
+
+	  function facts(app){
+	  		let number = Math.floor(Math.random()*5);
+	  		let output = funFacts[number];
+	  		app.tell("<speak>"+output+"</speak>");	
+	  }
+
+	  function errorIntent(app){
+	  		let output = errorMsg;
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("error: "+str);
+
+	  		app.ask("<speak>"+output+"</speak>");
+
+	  }
+
+
+	  function repeat(app){
+
+	  		let output = "";
+	  		let prevIntent = app.data.prevIntent;
+
+	  		if(prevIntent == "welcome"){
+	  			if(app.getLastSeen()){
+	  				output = introRepeat;
+	  			}else{
+	  				output = introText;
+	  			}
+	  		}else if(prevIntent == "genreQone"){
+	  			output = genreQOne;
+	  		}else if(prevIntent == "genreQtwo"){
+	  			output = genreQTwoRepeat;
+	  		}else if(prevIntent == "genreQthree"){
+	  			output = genreQThreeRepeat;
+	  		}else if(prevIntent == "psyQone"){
+	  			output = psyQuestionOneRepeat;
+	  		}else if(prevIntent == "psyQtwo"){
+	  			output = psyQuestionTwoRepeat;
+	  		}else if(prevIntent == "psyQthree"){
+	  			output = psyQuestionThreeRepeat;
+	  		}else if(prevIntent == "psyQfour"){
+	  			output = psyQuestionFourRepeat;
+	  		}else if(prevIntent == "sciQone"){
+	  			output = sciQuestionOneRepeat;
+	  		}else if(prevIntent == "sciQtwo"){
+	  			output = sciQuestionTwoRepeat;
+	  		}else if(prevIntent == "sciQthree"){
+	  			output = sciQuestionThreeRepeat;
+	  		}else if(prevIntent == "sciQfour"){
+	  			output = sciQuestionFourRepeat;
+	  		}else if(prevIntent == "supQone"){
+	  			output = supQuestionOneRepeat;
+	  		}else if(prevIntent == "supQtwo"){
+	  			output = supQuestionTwoRepeat;
+	  		}else if(prevIntent == "supQthree"){
+	  			output = supQuestionThreeRepeat;
+	  		}else if(prevIntent == "supQfour"){
+	  			output = supQuestionFourRepeat;
+	  		}else if(prevIntent == "psyEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = psyPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = psyPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = psyPackThreeRepeat;
+	  			}
+	  		}else if(prevIntent == "sciEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = sciPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = sciPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = sciPackThreeRepeat;
+	  			}
+	  		}else if(prevIntent == "supEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = supPackOneRepeat;
+	  			}else if(winner == "P2"){
+	  				output = supPackTwoRepeat;
+	  			}else if(winner == "P3"){
+	  				output = supPackThreeRepeat;
+	  			}else if(winner == "P4"){
+	  				output = supPackFourRepeat;
+	  			}else if(winner == "P5"){
+	  				output = supPackFiveRepeat;
+	  			}
+	  		}
+
+	  		app.ask("<speak>"+output+"</speak>");
+
+	  }
+
+
+	  function noInput(app){
+
+	  		let output = "";
+	  		let prevIntent = app.data.prevIntent;
+
+	  		if(prevIntent == "welcome"){
+	  			output = introRep;
+	  		}else if(prevIntent == "genreQone"){
+	  			output = genreOneRep;
+	  		}else if(prevIntent == "genreQtwo"){
+	  			output = genreTwoRep;
+	  		}else if(prevIntent == "genreQthree"){
+	  			output = genreThreeRep;
+	  		}else if(prevIntent == "psyQone"){
+	  			output = psyOneRep;
+	  		}else if(prevIntent == "psyQtwo"){
+	  			output = psyTwoRep;
+	  		}else if(prevIntent == "psyQthree"){
+	  			output = psyThreeRep;
+	  		}else if(prevIntent == "psyQfour"){
+	  			output = psyFourRep;
+	  		}else if(prevIntent == "sciQone"){
+	  			output = sciOneRep;
+	  		}else if(prevIntent == "sciQtwo"){
+	  			output = sciTwoRep;
+	  		}else if(prevIntent == "sciQthree"){
+	  			output = sciThreeRep;
+	  		}else if(prevIntent == "sciQfour"){
+	  			output = sciFourRep;
+	  		}else if(prevIntent == "supQone"){
+	  			output = supOneRep;
+	  		}else if(prevIntent == "supQtwo"){
+	  			output = supTwoRep;
+	  		}else if(prevIntent == "supQthree"){
+	  			output = supThreeRep;
+	  		}else if(prevIntent == "supQfour"){
+	  			output = supFourRep;
+	  		}else if(prevIntent == "psyEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = psyPackOneRep;
+	  			}else if(winner == "P2"){
+	  				output = psyPackTwoRep;
+	  			}else if(winner == "P3"){
+	  				output = psyPackThreeRep;
+	  			}
+	  		}else if(prevIntent == "sciEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = sciPackOneRep;
+	  			}else if(winner == "P2"){
+	  				output = sciPackTwoRep;
+	  			}else if(winner == "P3"){
+	  				output = sciPackThreeRep;
+	  			}
+	  		}else if(prevIntent == "supEnd"){
+	  			let winner = app.data.winner;
+	  			if(winner == "P1"){
+	  				output = supPackOneRep;
+	  			}else if(winner == "P2"){
+	  				output = supPackTwoRep;
+	  			}else if(winner == "P3"){
+	  				output = supPackThreeRep;
+	  			}else if(winner == "P4"){
+	  				output = supPackFourRep;
+	  			}else if(winner == "P5"){
+	  				output = supPackFiveRep;
+	  			}
+	  		}
+
+	  		app.ask("<speak>"+output+"</speak>");
+
+	  }
+
+	  function help(app){
+	  		
+
+	  		app.ask("<speak>"+helpMsg+"</speak>");
+	  }
+
+	  function startOver(app){
+
+	  		let output = startOv + genreQOne;
+	  		app.data.prevIntent = "genreQone";
+	  		app.setContext('firstgenre', 5, {});
+	  		app.setContext('thirdgenre', 0, {});
+	  		app.setContext('secondgenre', 0, {});
+	  		app.setContext('intro', 0, {});
+	  		app.setContext('scione', 0, {});
+	  		app.setContext('psyone', 0, {});
+	  		app.setContext('supone', 0, {});
+	  		app.setContext('scitwo', 0, {});
+	  		app.setContext('psytwo', 0, {});
+	  		app.setContext('suptwo', 0, {});
+	  		app.setContext('scithree', 0, {});
+	  		app.setContext('psythree', 0, {});
+	  		app.setContext('supthree', 0, {});
+	  		app.setContext('scifour', 0, {});
+	  		app.setContext('psyfour', 0, {});
+	  		app.setContext('supfour', 0, {});
+	  		app.setContext('sciend', 0, {});
+	  		app.setContext('psyend', 0, {});
+	  		app.setContext('supend', 0, {});
+	  		app.ask("<speak>"+output+"</speak>");
+
+
+	  }
+
+
+
+	  function supEndNo(app){
+	  		app.setContext('supend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = supPackOneEnd;
+			}else if(winner == "P2"){
+				output = supPackTwoEnd;
+			}else if(winner == "P3"){
+				output = supPackThreeEnd;
+			}else if(winner == "P4"){
+				output = supPackFourEnd;
+			}else if(winner == "P5"){
+				output = supPackFiveEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
+
+	  }
+
+
+	  function supEndYes(app){
+	  		app.setContext('supend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = supPackOneClip + supPackOneEnd;
+			}else if(winner == "P2"){
+				output = supPackTwoClip + supPackTwoEnd;
+			}else if(winner == "P3"){
+				output = supPackThreeClip + supPackThreeEnd;
+			}else if(winner == "P4"){
+				output = supPackFourClip + supPackFourEnd;
+			}else if(winner == "P5"){
+				output = supPackFiveClip + supPackFiveEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
+
+
+	  }
+
 	 
 	  function supFourC(app){
+	  		app.setContext('supfour', 0, {});
+	  		app.setContext('supend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "Dys";
 	  		let winner = calculateWinner(3, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = supPackOneIntro;
+			}else if(winner == "P2"){
+				output = supPackTwoIntro;
+			}else if(winner == "P3"){
+				output = supPackThreeIntro;
+			}else if(winner == "P4"){
+				output = supPackFourIntro;
+			}else if(winner == "P5"){
+				output = supPackFiveIntro;
+			}
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('supfour', 0, {});
+	  		app.data.prevIntent = "supEnd";
+	  		
+	  		app.ask("<speak>"+output+"</speak>");
 
 	  }
 
 	  function supFourB(app){
+	  		app.setContext('supfour', 0, {});
+	  		app.setContext('supend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "CoA";
 	  		let winner = calculateWinner(3, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		
+	  		if(winner == "P1"){
+				output = supPackOneIntro;
+				
+			}else if(winner == "P2"){
+				output = supPackTwoIntro;
+			
+			}else if(winner == "P3"){
+				output = supPackThreeIntro;
+			
+			}else if(winner == "P4"){
+				output = supPackFourIntro;
+				
+			}else if(winner == "P5"){
+				output = supPackFiveIntro;
+				
+			}
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('supfour', 0, {});
+	  		app.data.prevIntent = "supEnd";
+	  		
+	  		app.ask("<speak>"+output+"</speak>");
 
 	  }
 
 	  function supFourA(app){
+	  		app.setContext('supfour', 0, {});
+	  		app.setContext('supend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "GH";
 	  		let winner = calculateWinner(3, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = supPackOneIntro;
+			}else if(winner == "P2"){
+				output = supPackTwoIntro;
+			}else if(winner == "P3"){
+				output = supPackThreeIntro;
+			}else if(winner == "P4"){
+				output = supPackFourIntro;
+			}else if(winner == "P5"){
+				output = supPackFiveIntro;
+			}
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('supfour', 0, {});
+
+
+	  		app.data.prevIntent = "supEnd";
+
+	  		app.ask("<speak>"+output+"</speak>");
 
 	  }
 
 	  function supThreeC(app){
-	  		app.data.answerThree = "ID";
-	  		app.ask(supQuestionFour);
-	  		app.setContext('supfour', 1, {});
 	  		app.setContext('supthree', 0, {});
+	  		app.setContext('supfour', 5, {});
+	  		app.data.answerThree = "ID";
+	  		app.data.prevIntent = "supQfour";
+	  		app.ask("<speak>"+supQuestionFour+"</speak>");
+	  		
+	  		
 
 	  }
 
 	  function supThreeB(app){
-	  		app.data.answerThree = "PoC";
-	  		app.ask(supQuestionFour);
-	  		app.setContext('supfour', 1, {});
 	  		app.setContext('supthree', 0, {});
+	  		app.setContext('supfour', 5, {});
+	  		app.data.answerThree = "PoC";
+	  		app.data.prevIntent = "supQfour";
+	  		app.ask("<speak>"+supQuestionFour+"</speak>");
+	  		
+	  		
 
 	  }
 
 	  function supThreeA(app){
-	  		app.data.answerThree = "Alt";
-	  		app.ask(supQuestionFour);
-	  		app.setContext('supfour', 1, {});
 	  		app.setContext('supthree', 0, {});
+	  		app.setContext('supfour', 5, {});
+	  		app.data.answerThree = "Alt";
+	  		app.data.prevIntent = "supQfour";
+	  		app.ask("<speak>"+supQuestionFour+"</speak>");
+	  		
+	  		
 
 	  }
 
 	  function supTwoC(app){
-	  		app.data.answerTwo = "Mys";
-	  		app.ask(supQuestionThree);
-	  		app.setContext('supthree', 1, {});
 	  		app.setContext('suptwo', 0, {});
+	  		app.setContext('supthree', 5, {});
+	  		app.data.answerTwo = "Mys";
+	  		app.data.prevIntent = "supQthree";
+	  		app.ask("<speak>"+supQuestionThree+"</speak>");
+	  		
+	  		
 	  }
 
 	  function supTwoB(app){
-	  		app.data.answerTwo = "C";
-	  		app.ask(supQuestionThree);
-	  		app.setContext('supthree', 1, {});
 	  		app.setContext('suptwo', 0, {});
+	  		app.setContext('supthree', 5, {});
+	  		app.data.answerTwo = "C";
+	  		app.data.prevIntent = "supQthree";
+	  		app.ask("<speak>"+supQuestionThree+"</speak>");
+	  		
+	  		
 	  }
 
 	  function supTwoA(app){
-	  		app.data.answerTwo = "Mur";
-	  		app.ask(supQuestionThree);
-	  		app.setContext('supthree', 1, {});
 	  		app.setContext('suptwo', 0, {});
+	  		app.setContext('supthree', 5, {});
+	  		app.data.answerTwo = "Mur";
+	  		app.data.prevIntent = "supQthree";
+	  		app.ask("<speak>"+supQuestionThree+"</speak>");
+	  		
+	  		
 	  }
 
 	  function supOneC(app){
-	  		app.data.answerOne = "HoD";
-	  		app.ask(supQuestionTwo);
-	  		app.setContext('suptwo', 1, {});
 	  		app.setContext('supone', 0, {});
+	  		app.setContext('suptwo', 5, {});
+	  		app.data.answerOne = "HoD";
+	  		app.data.prevIntent = "supQtwo";
+	  		
+
+	  		
+	  		app.ask("<speak>"+supQuestionTwo+"</speak>");
+
 
 	  }
 	  
 	  function supOneB(app){
-	  		app.data.answerOne = "GvE";
-	  		app.ask(supQuestionTwo);
-	  		app.setContext('suptwo', 1, {});
 	  		app.setContext('supone', 0, {});
+	  		app.setContext('suptwo', 5, {});
+	  		app.data.answerOne = "GvE";
+	  		app.data.prevIntent = "supQtwo";
+	  		
+
+	  		
+	  		app.ask("<speak>"+supQuestionTwo+"</speak>");
+
 
 	  }
 
 	  function supOneA(app){
-	  		app.data.answerOne = "T";
-	  		app.ask(supQuestionTwo);
-	  		app.setContext('suptwo', 1, {});
 	  		app.setContext('supone', 0, {});
+	  		app.setContext('suptwo', 5, {});
+	  		app.data.answerOne = "T";
+	  		app.data.prevIntent = "supQtwo";
+	  		
+
+	  		
+	  		app.ask("<speak>"+supQuestionTwo+"</speak>");
+	  		
+
+
+	  }
+
+
+	  function sciEndNo(app){
+	  		app.setContext('sciend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = sciPackOneEnd;
+			}else if(winner == "P2"){
+				output = sciPackTwoEnd;
+			}else if(winner == "P3"){
+				output = sciPackThreeEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
+
+	  }
+
+
+	  function sciEndYes(app){
+	  		app.setContext('sciend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = sciPackOneClip + sciPackOneEnd;
+			}else if(winner == "P2"){
+				output = sciPackTwoClip + sciPackTwoEnd;
+			}else if(winner == "P3"){
+				output = sciPackThreeClip + sciPackThreeEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
 
 	  }
 
 	  
 	  function sciFourB(app){
+	  		app.setContext('scifour', 0, {});
+	  		app.setContext('sciend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "Mys";
 	  		let winner = calculateWinner(2, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = sciPackOneIntro;
+			}else if(winner == "P2"){
+				output = sciPackTwoIntro;
+			}else if(winner == "P3"){
+				output = sciPackThreeIntro;
+			}
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('scifour', 0, {});
+	  		app.data.prevIntent = "sciEnd";
+
+	  		app.ask("<speak>"+output+"</speak>");
 	  }
 
 	  function sciFourA(app){
+	  		app.setContext('scifour', 0, {});
+	  		app.setContext('sciend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "Mar";
 	  		let winner = calculateWinner(2, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		let prevPack = "";
+	  		if(winner == "P1"){
+				output = sciPackOneIntro;
+		
+			}else if(winner == "P2"){
+				output = sciPackTwoIntro;
+			
+			}else if(winner == "P3"){
+				output = sciPackThreeIntro;
+		
+			}
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('scifour', 0, {});
+	  		app.data.prevIntent = "sciEnd";
+	  		
+	  		
+	  		app.ask("<speak>"+output+"</speak>");
 	  }
 
 	  function sciThreeB(app){
-	  		app.data.answerThree = "Alt";
-	  		app.ask(sciQuestionFour);
-	  		app.setContext('scifour', 1, {});
 	  		app.setContext('scithree', 0, {});
+	  		app.setContext('scifour', 5, {});
+	  		app.data.answerThree = "Alt";
+	  		app.data.prevIntent = "sciQfour";
+	  		app.ask("<speak>"+sciQuestionFour+"</speak>");
+	  		
+	  		
 	  }
 
 	  function sciThreeA(app){
-	  		app.data.answerThree = "CoA";
-	  		app.ask(sciQuestionFour);
-	  		app.setContext('scifour', 1, {});
 	  		app.setContext('scithree', 0, {});
+	  		app.setContext('scifour', 5, {});
+	  		app.data.answerThree = "CoA";
+	  		app.data.prevIntent = "sciQfour";
+	  		app.ask("<speak>"+sciQuestionFour+"</speak>");
+	  		
+	  		
 	  }
 
 	  function sciTwoB(app){
-	  		app.data.answerTwo = "SotP";
-	  		app.ask(sciQuestionThree);
-	  		app.setContext('scithree', 1, {});
 	  		app.setContext('scitwo', 0, {});
+	  		app.setContext('scithree', 5, {});
+	  		app.data.answerTwo = "SotP";
+	  		app.data.prevIntent = "sciQthree";
+	  		app.ask("<speak>"+sciQuestionThree+"</speak>");
+	  		
+	  		
 	  }
 
 	  function sciTwoA(app){
-	  		app.data.answerTwo = "S";
-	  		app.ask(sciQuestionThree);
-	  		app.setContext('scithree', 1, {});
 	  		app.setContext('scitwo', 0, {});
+	  		app.setContext('scithree', 5, {});
+	  		app.data.answerTwo = "S";
+	  		app.data.prevIntent = "sciQthree";
+	  		app.ask("<speak>"+sciQuestionThree+"</speak>");
+	  		
+	  		
 	  }
 
 	  function sciOneC(app){
-	  		app.data.answerOne = "Dys";
-	  		app.ask(sciQuestionTwo);
-	  		app.setContext('scitwo', 1, {});
 	  		app.setContext('scione', 0, {});
+	  		app.setContext('scitwo', 5, {});
+	  		app.data.answerOne = "Dys";
+	  		app.data.prevIntent = "sciQtwo";
+	  		
+	  		
+
+	  		app.ask("<speak>"+sciQuestionTwo+"</speak>");
+
 	  }
 
 	  function sciOneB(app){
-	  		app.data.answerOne = "T";
-	  		app.ask(sciQuestionTwo);
-	  		app.setContext('scitwo', 1, {});
 	  		app.setContext('scione', 0, {});
+	  		app.setContext('scitwo', 5, {});
+	  		app.data.answerOne = "T";
+	  		app.data.prevIntent = "sciQtwo";
+	  		
+	  		
+
+	  		app.ask("<speak>"+sciQuestionTwo+"</speak>");
+
 	  }
 
 
 	  function sciOneA(app){
-
-	  		app.data.answerOne = "GvE";
-	  		app.ask(sciQuestionTwo);
-	  		app.setContext('scitwo', 1, {});
 	  		app.setContext('scione', 0, {});
+	  		app.setContext('scitwo', 5, {});
+	  		app.data.answerOne = "GvE";
+	  		app.data.prevIntent = "sciQtwo";
+	  		
+	  		
+	
+	  		app.ask("<speak>"+sciQuestionTwo+"</speak>");
+
+	  }
+
+	  function psyEndNo(app){
+	  		app.setContext('psyend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = psyPackOneEnd;
+			}else if(winner == "P2"){
+				output = psyPackTwoEnd;
+			}else if(winner == "P3"){
+				output = psyPackThreeEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
+	  }
+
+
+	  function psyEndYes(app){
+	  		app.setContext('psyend', 0, {});
+	  		let winner = app.data.winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = psyPackOneClip + psyPackOneEnd;
+			}else if(winner == "P2"){
+				output = psyPackTwoClip + psyPackTwoEnd;
+			}else if(winner == "P3"){
+				output = psyPackThreeClip + psyPackThreeEnd;
+			}
+
+			
+			app.tell("<speak>"+output+"</speak>");
+
 	  }
 
 	  function psyFourB(app){
-
+	  		app.setContext('psyfour', 0, {});
+	  		app.setContext('psyend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "PoC";
 	  		let winner = calculateWinner(1, answerOne, answerTwo, answerThree, answerFour);
+	  		app.data.winner = winner;
+	  		let output = "";
 
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('psyfour', 0, {});
+	  		if(winner == "P1"){
+				output = psyPackOneIntro;
+	
+			}else if(winner == "P2"){
+				output = psyPackTwoIntro;
+		
+			}else if(winner == "P3"){
+				output = psyPackThreeIntro;
+			
+			}
+
+	  		app.data.prevIntent = "psyEnd";
+	  		
+	  		
+	  		app.ask("<speak>"+output+"</speak>");
 	  }
 
 
 	  function psyFourA(app){
+	  		app.setContext('psyfour', 0, {});
+	  		app.setContext('psyend', 5, {});
 	  		let answerOne = app.data.answerOne;
 	  		let answerTwo = app.data.answerTwo;
 	  		let answerThree = app.data.answerThree;
 	  		let answerFour = "GH";
 	  		let winner = calculateWinner(1, answerOne, answerTwo, answerThree, answerFour);
-
-	  		app.ask(outroPartOne + winner + outroPartTwo);
-	  		app.setContext('psyfour', 0, {});
+	  		app.data.winner = winner;
+	  		let output = "";
+	  		if(winner == "P1"){
+				output = psyPackOneIntro;
+			}else if(winner == "P2"){
+				output = psyPackTwoIntro;
+			}else if(winner == "P3"){
+				output = psyPackThreeIntro;
+			}
+	  		app.data.prevIntent = "psyEnd";
+	  		
+	  		
+	  		app.ask("<speak>"+output+"</speak>");
 
 
 	  }
 
 	  function psyThreeB(app){
-	  		app.data.answerThree = "CoA";
-	  		app.ask(psyQuestionFour);
-	  		app.setContext('psyfour', 1, {});
 	  		app.setContext('psythree', 0, {});
+	  		app.setContext('psyfour', 5, {});
+	  		app.data.answerThree = "CoA";
+	  		app.data.prevIntent = "psyQfour";
+	  		app.ask("<speak>"+psyQuestionFour+"</speak>");
+	  		
+	  		
 	  }
 
 	  function psyThreeA(app){
-	  		app.data.answerThree = "SotP";
-	  		app.ask(psyQuestionFour);
-	  		app.setContext('psyfour', 1, {});
 	  		app.setContext('psythree', 0, {});
+	  		app.setContext('psyfour', 5, {});
+	  		app.data.answerThree = "SotP";
+	  		app.data.prevIntent = "psyQfour";
+	  		app.ask("<speak>"+psyQuestionFour+"</speak>");
+	  		
+	  		
 
 	  }
 
 	  function psyTwoB(app){
-	  		app.data.answerTwo = "ID";
-	  		app.ask(psyQuestionThree);
-	  		app.setContext('psythree', 1, {});
 	  		app.setContext('psytwo', 0, {});
+	  		app.setContext('psythree', 5, {});
+	  		app.data.answerTwo = "ID";
+	  		app.data.prevIntent = "psyQthree";
+	  		app.ask("<speak>"+psyQuestionThree+"</speak>");
+	  		
+	  		
 
 	  }
 
 	  function psyTwoA(app){
-	  		app.data.answerTwo = "C";
-	  		app.ask(psyQuestionThree);
-	  		app.setContext('psythree', 1, {});
 	  		app.setContext('psytwo', 0, {});
+	  		app.setContext('psythree', 5, {});
+	  		app.data.answerTwo = "C";
+	  		app.data.prevIntent = "psyQthree";
+	  		app.ask("<speak>"+psyQuestionThree+"</speak>");
+	  		
+	  		
 
 	  }
 
 
 	  function psyOneC(app){
-	  		app.data.answerOne = "HoD";
-	  		app.ask(psyQuestionTwo);
-	  		app.setContext('psytwo', 1, {});
 	  		app.setContext('psyone', 0, {});
+	  		app.setContext('psytwo', 5, {});
+	  		app.data.answerOne = "HoD";
+	  		app.data.prevIntent = "psyQtwo";
+	  		
+	  		
+
+	  		app.ask("<speak>"+psyQuestionTwo+"</speak>");
 	  }
 
 	  function psyOneB(app){
-	  		app.data.answerOne = "T";
-	  		app.ask(psyQuestionTwo);
-	  		app.setContext('psytwo', 1, {});
 	  		app.setContext('psyone', 0, {});
+	  		app.setContext('psytwo', 5, {});
+	  		app.data.answerOne = "T";
+	  		app.data.prevIntent = "psyQtwo";
+	  		
+	  		
+	  		app.ask("<speak>"+psyQuestionTwo+"</speak>");
+
 
 	  }
 
 	  function psyOneA(app){
-
-	  		app.data.answerOne = "S";
-	  		app.ask(psyQuestionTwo);
-	  		app.setContext('psytwo', 1, {});
 	  		app.setContext('psyone', 0, {});
+	  		app.setContext('psytwo', 5, {});
+	  		app.data.answerOne = "S";
+	  		app.data.prevIntent = "psyQtwo";
+	  		
+	  		
+
+	  		app.ask("<speak>"+psyQuestionTwo+"</speak>");
+
 
 	  }
 
@@ -706,27 +1446,35 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 	  		let genreOne = app.data.genreFirst;
 	  		let genreTwo = app.data.genreSecond;
-	  		let genreThree = 3;
+	  		let genreThree = 2;
 
 	  		let catChoice = calculateGenre(genreOne, genreTwo, genreThree);
 	  		
 	  		if(catChoice == 1){
-
-	  			app.ask(psyQuestionOne);
-	  			app.setContext('psyone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('psyone', 5, {});
+	  			app.data.prevIntent = "psyQone";
+	  			app.ask("<speak>"+psyQuestionOne+"</speak>");
+	  			
+	 
+	  			
 
 	  		}else if(catChoice == 2){
-
-	  			app.ask(sciQuestionOne);
-	  			app.setContext('scione', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('scione', 5, {});
+	  			app.data.prevIntent = "sciQone";
+	  			app.ask("<speak>"+sciQuestionOne+"</speak>");
+	  			
+	  	
+	  			
 
 	  		}else{
-
-	  			app.ask(supQuestionOne);
-	  			app.setContext('supone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('supone', 5, {});
+	  			app.data.prevIntent = "supQone";
+	  			app.ask("<speak>"+supQuestionOne+"</speak>");
+	  			
+	  			
 
 	  		}
 
@@ -736,27 +1484,35 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 	  		let genreOne = app.data.genreFirst;
 	  		let genreTwo = app.data.genreSecond;
-	  		let genreThree = 2;
+	  		let genreThree = 1;
 
 	  		let catChoice = calculateGenre(genreOne, genreTwo, genreThree);
 	  		
 	  		if(catChoice == 1){
-
-	  			app.ask(psyQuestionOne);
-	  			app.setContext('psyone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('psyone', 5, {});
+	  			app.data.prevIntent = "psyQone";
+	  			app.ask("<speak>"+psyQuestionOne+"</speak>");
+	  			
+	  			
 
 	  		}else if(catChoice == 2){
-
-	  			app.ask(sciQuestionOne);
-	  			app.setContext('scione', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('scione', 5, {});
+	  			app.data.prevIntent = "sciQone";
+	  			app.ask("<speak>"+sciQuestionOne+"</speak>");
+	  			
+	  		
+	  			
 
 	  		}else{
-
-	  			app.ask(supQuestionOne);
-	  			app.setContext('supone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('supone', 5, {});
+	  			app.data.prevIntent = "supQone";
+	  			app.ask("<speak>"+supQuestionOne+"</speak>");
+	  			
+	  		
+	  			
 
 	  		}
 
@@ -766,27 +1522,35 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  function genreThirdA(app){
 	  		let genreOne = app.data.genreFirst;
 	  		let genreTwo = app.data.genreSecond;
-	  		let genreThree = 1;
+	  		let genreThree = 3;
 
 	  		let catChoice = calculateGenre(genreOne, genreTwo, genreThree);
 	  		
 	  		if(catChoice == 1){
-
-	  			app.ask(psyQuestionOne);
-	  			app.setContext('psyone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('psyone', 5, {});
+	  			app.data.prevIntent = "psyQone";
+	  			app.ask("<speak>"+psyQuestionOne+"</speak>");
+	  			
+	  		
+	  			
 
 	  		}else if(catChoice == 2){
-
-	  			app.ask(sciQuestionOne);
-	  			app.setContext('scione', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('scione', 5, {});
+	  			app.data.prevIntent = "sciQone";
+	  			app.ask("<speak>"+sciQuestionOne+"</speak>");
+	  			
+	  
+	  			
 
 	  		}else{
-
-	  			app.ask(supQuestionOne);
-	  			app.setContext('supone', 1, {});
 	  			app.setContext('thirdgenre', 0, {});
+	  			app.setContext('supone', 5, {});
+	  			app.data.prevIntent = "supQone";
+	  			app.ask("<speak>"+supQuestionOne+"</speak>");
+	  			
+	  			
 
 	  		}
 
@@ -794,69 +1558,117 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 
 	  function genreSecondC(app){
-	  		app.data.genreSecond = 2;
-	  		app.ask(genreQThree);
-
-	  		app.setContext('thirdgenre', 1, {});
+	  		app.data.prevIntent = "genreQthree";
 	  		app.setContext('secondgenre', 0, {});
+	  		app.setContext('thirdgenre', 5, {});
+	  		app.data.genreSecond = 1;
+	  		app.ask("<speak>"+genreQThree+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 2C "+str);
+	  		
+	  		
+	  		
 
 	  }
 
 	  function genreSecondB(app){
-	  		app.data.genreSecond = 1;
-	  		app.ask(genreQThree);
-
-	  		app.setContext('thirdgenre', 1, {});
+	  		app.data.prevIntent = "genreQthree";
 	  		app.setContext('secondgenre', 0, {});
+	  		app.setContext('thirdgenre', 5, {});
+	  		app.data.genreSecond = 2;
+	  		app.ask("<speak>"+genreQThree+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 2B "+str);
+	  		
+	  		
+	  		
 
 	  }
 
 
 	  function genreSecondA(app){
-	  		app.data.genreSecond = 3;
-	  		app.ask(genreQThree);
-
-	  		app.setContext('thirdgenre', 1, {});
+	  		app.data.prevIntent = "genreQthree";
 	  		app.setContext('secondgenre', 0, {});
+	  		app.setContext('thirdgenre', 5, {});
+	  		app.data.genreSecond = 3;
+	  		app.ask("<speak>"+genreQThree+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 2a "+str);
+			
+	  		
+	  		
 
 	  }
 
 
 	  function genreFirstC(app){
-
+	  		app.data.prevIntent = "genreQtwo";
+			app.setContext('firstgenre', 0, {});
+			app.setContext('secondgenre', 5, {});
 	  		app.data.genreFirst = 2;
-	  		app.ask(genreQTwo);
-
-	  		app.setContext('secondgenre', 1, {});
-	  		app.setContext('firstgenre', 0, {});	  		
+	  		app.ask("<speak>"+genreQTwo+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 1c "+str);
+	  		
+	  		
+	  			  		
 
 	  }
 
 	  function genreFirstB(app){
-
-	  		app.data.genreFirst = 1;
-	  		app.ask(genreQTwo);
-
-	  		app.setContext('secondgenre', 1, {});
+	  		app.data.prevIntent = "genreQtwo";
 	  		app.setContext('firstgenre', 0, {});
+	  		app.setContext('secondgenre', 5, {});
+	  		app.data.genreFirst = 1;
+	  		app.ask("<speak>"+genreQTwo+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 1B "+str);
+	  		
+
 
 	  }
 
 	  function genreFirstA(app){
-	  		app.data.genreFirst = 3;
-	  		app.ask(genreQTwo);
-
-	  		app.setContext('secondgenre', 1, {});
+	  		app.data.prevIntent = "genreQtwo";
 	  		app.setContext('firstgenre', 0, {});
+	  		app.setContext('secondgenre', 5, {});
+	  		app.data.genreFirst = 3;
+	  		app.ask("<speak>"+genreQTwo+"</speak>");
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("genre 1A "+str);
+	  		
+	  		
+	  		
 
 	  }
 
 	  function yes(app){
+	  		app.data.prevIntent = "genreQone";
+			app.setContext('intro', 0, {});
+			app.setContext('firstgenre', 5, {});
+	  		
+	  		app.ask("<speak>"+genreQOne+"</speak>");
+	  		
+	  		
 
-	  		app.ask(genreQOne);
-	  		app.setContext('firstgenre', 1, {});
+
+	  }
+
+	  function begin(app){
 	  		app.setContext('intro', 0, {});
-
+	  		app.setContext('firstgenre', 5, {});
+	  		
+	  		app.data.prevIntent = "genreQone";
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("begin "+str);
+	  		app.ask("<speak>"+genreQOne+"</speak>");
 
 	  }
 
@@ -864,27 +1676,71 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  function welcomeIntent(app){
 
 
+
+	  		app.setContext('intro', 5, {});
+	  		app.data.prevIntent = "welcome";
+	  		if(app.getLastSeen()){
+	  			app.ask("<speak>"+introRepeat+"</speak>");
+	  			// app.ask("testing the action");
+	  			
+	  		}else{
+	  			app.ask("<speak>"+introText+"</speak>");
+	  			// app.ask("testing the action");
+	  		}
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("welcome intent "+str);
 	  		
-	  		app.ask(introText);
-	  		app.setContext('intro', 1, {});
+
+
+	  }
+
+	  function openIntent(app){
+
+
+
+	  		app.setContext('intro', 5, {});
+	  		app.data.prevIntent = "welcome";
+	  		if(app.getLastSeen()){
+	  			app.ask("<speak>"+introRepeat+"</speak>");
+	  			// app.ask("testing the action");
+	  			
+	  		}else{
+	  			app.ask("<speak>"+introText+"</speak>");
+	  			// app.ask("testing the action");
+	  		}
+	  		let context = app.getContexts();
+	  		let str = JSON.stringify(context, null, 4);
+	  		console.log("welcome intent "+str);
+	  		
 
 
 	  }
 
 
 
-	  let actionmap = new Map();
-	  actionMap.set('input.welcome', welcomeIntent);
-	  actionMap.set('yes', yes);
-	  actionMap.set('genrefirsta', genreFirstA);
-	  actionMap.set('genrefirstb', genreFirstB);
-	  actionMap.set('genrefirstc', genreFirstC);
-	  actionMap.set('genreseconda', genreSecondA);
-	  actionMap.set('genresecondb', genreSecondB);
-	  actionMap.set('genresecondc', genreSecondC);
-	  actionMap.set('genrethirda', genreThirdA);
-	  actionMap.set('genrethirdb', genreThirdB);
-	  actionMap.set('genrethirdc', genreThirdC);
+	  let actionMap = new Map();
+	  actionMap.set('welcome', welcomeIntent);
+	  actionMap.set('yesstart', yes);
+	  actionMap.set('begin', begin);
+	  actionMap.set('help', help);
+	  actionMap.set('startover', startOver);
+	  actionMap.set('onwrite', onWrite);
+	  actionMap.set('sb', sb);
+	  actionMap.set('castle', castle);
+	  actionMap.set('facts', facts);
+	  actionMap.set('pause', pause);
+	  actionMap.set('repeat', repeat);
+	  actionMap.set('outsider', outsider);
+	  actionMap.set('genreonea', genreFirstA);
+	  actionMap.set('genreoneb', genreFirstB);
+	  actionMap.set('genreonec', genreFirstC);
+	  actionMap.set('genretwoa', genreSecondA);
+	  actionMap.set('genretwob', genreSecondB);
+	  actionMap.set('genretwoc', genreSecondC);
+	  actionMap.set('genrethreea', genreThirdA);
+	  actionMap.set('genrethreeb', genreThirdB);
+	  actionMap.set('genrethreec', genreThirdC);
 	  actionMap.set('psyonea', psyOneA);
 	  actionMap.set('psyoneb', psyOneB);
 	  actionMap.set('psyonec', psyOneC);
@@ -894,6 +1750,8 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  actionMap.set('psythreeb', psyThreeB);
 	  actionMap.set('psyfoura', psyFourA);
 	  actionMap.set('psyfourb', psyFourB);
+	  actionMap.set('psyendyes', psyEndYes);
+	  actionMap.set('psyendno', psyEndNo);
 	  actionMap.set('scionea', sciOneA);
 	  actionMap.set('scioneb', sciOneB);
 	  actionMap.set('scionec', sciOneC);
@@ -903,9 +1761,10 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  actionMap.set('scithreeb', sciThreeB);
 	  actionMap.set('scifoura', sciFourA);
 	  actionMap.set('scifourb', sciFourB);
+	  actionMap.set('sciendyes', sciEndYes);
+	  actionMap.set('sciendno', sciEndNo);
 	  actionMap.set('suponea', supOneA);
 	  actionMap.set('suponeb', supOneB);
-	  actionMap.set('suponec', supOneC);
 	  actionMap.set('suponec', supOneC);
 	  actionMap.set('suptwoa', supTwoA);
 	  actionMap.set('suptwob', supTwoB);
@@ -916,6 +1775,11 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  actionMap.set('supfoura', supFourA);
 	  actionMap.set('supfourb', supFourB);
 	  actionMap.set('supfourc', supFourC);
+	  actionMap.set('supendyes', supEndYes);
+	  actionMap.set('supendno', supEndNo);
+	  actionMap.set('no.input', noInput);
+	  actionMap.set('input.unknown', errorIntent);
+	  actionMap.set('open', openIntent);
 
 
 
