@@ -127,6 +127,7 @@ const supPackFiveRep = "Would you like to hear a short preview of Pet Sematary?"
 const writeEgg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/12_On_Writing_Final.mp3'>On Writing Easter Egg</audio>";
 const sbEE = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/SKOK_mixdown.mp3'>Sleeping Beauties Easter Egg</audio>";
 const outClip = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/11_The_Outsider_Final.mp3'>The Outsider Easter Egg</audio>";
+const psClip = "<audio src ='https://s3.amazonaws.com/stephenkingassets/googleassets/eastereggs/10_Pet+Sematary_Final.mp3' >Pet Sematary Easter Egg. </audio>";
 
 const startOv = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/06_STARTING_OVER.mp3'>Starting Over</audio>";
 const stopMsg = "<audio src='https://s3.amazonaws.com/stephenkingassets/googleassets/techmsg/11_EXIT_SEEYOUSOON.mp3'>Stopping</audio>";
@@ -641,6 +642,16 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  		app.ask("<speak>"+pauseMsg+"<break time='.25s'/>"+output+"</speak>");
 	  }
 
+	  function it(app){
+	  	let output = "<speak>The paperback edition of It, weighs more than 2 pounds. If you listen to the audio book, it will take more than 40 hours. Plan a long car ride and turn on the audio. If you’re looking for your next great read say, OK Google, Open Stephen King Library.</speak>";
+	  	app.tell(output);
+	  }
+
+	  function elevation(app){
+	  	let output = "<speak>Something eerie is happening in Castle Rock, Maine. Make sure to check out Elevation, a new novel by Stephen King coming out on October thirtieth. It's set in the fictional town of Castle Rock - a recurring setting in King's tales. And if you’re looking for your next great read, say OK Google, open Stephen King Library. </speak>";
+	  	app.tell(output);
+	  }
+
 	  function sb(app){
 		  	let output = "<speak>Here is a clip of Stephen King and his son, Owen King, talking about writing the book together."+sbEE+"By the way, If you’re looking for your next great read, say, Ok Google, open Stephen King Library.</speak>";
 		  	app.tell(output);
@@ -660,6 +671,16 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 		  	let output ="<speak>Here's an audio excerpt from the Outsider."+outClip+"If you’re looking for your next great read, say Alexa, open Stephen King Library.</speak>";
 		  	app.tell(output);
 
+	  }
+
+	  function mercedes(app){
+	  		let output = "<speak>Can a man who is hospitalized in a vegetative state still create chaos?  Did you know Mr. Mercedes is the first book in Stephen King’s Bill Hodges trilogy?  And if you’re looking for your next great read, say Ok Google, open Stephen King Library. </speak>";
+	  		app.tell(output);
+	  }
+
+	  function pet(app){
+	  		let output = "<speak> "+psClip+" Check out the movie after you've finished reading the book. By the way, if you're looking for your next great read say ok Google, open Stephen King Library. </speak>";
+	  		app.tell(output);
 	  }
 
 	  function facts(app){
@@ -1720,6 +1741,8 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 
 
 	  let actionMap = new Map();
+	  actionMap.set('itEgg', it);
+	  actionMap.set('elevation', elevation);
 	  actionMap.set('welcome', welcomeIntent);
 	  actionMap.set('yesstart', yes);
 	  actionMap.set('begin', begin);
@@ -1732,6 +1755,8 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  actionMap.set('pause', pause);
 	  actionMap.set('repeat', repeat);
 	  actionMap.set('outsider', outsider);
+	  actionMap.set('mercedes', mercedes);
+	  actionMap.set('pet', pet);
 	  actionMap.set('genreonea', genreFirstA);
 	  actionMap.set('genreoneb', genreFirstB);
 	  actionMap.set('genreonec', genreFirstC);
