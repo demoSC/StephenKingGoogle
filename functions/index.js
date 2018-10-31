@@ -648,7 +648,7 @@ exports.stephenKing = functions.https.onRequest((request, response) => {
 	  }
 
 	  function elevation(app){
-	  	let output = "<speak>Something eerie is happening in Castle Rock, Maine. Make sure to check out Elevation, a new novel by Stephen King coming out on October thirtieth. It's set in the fictional town of Castle Rock - a recurring setting in King's tales. And if you’re looking for your next great read, say OK Google, open Stephen King Library. </speak>";
+	  	let output = "<speak>Something eerie is happening in Castle Rock, Maine. Make sure to check out Elevation, a new novel by Stephen King. It's set in the fictional town of Castle Rock - a recurring setting in King's tales. And if you’re looking for your next great read, say OK Google, open Stephen King Library. </speak>";
 	  	app.tell(output);
 	  }
 
